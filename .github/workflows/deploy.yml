@@ -1,0 +1,72 @@
+name: "Azure DevSecOps Terraform Deployment"
+
+on:
+  push:
+    branches:
+      - main  # Jab aap main branch par push karenge tab pipeline chalegi
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  devsecops_and_deploy:
+    name: "Validate, Scan and Deploy"
+    runs-on: ubuntu-latest
+
+    env:
+      # Azure Authentication Environment Variables
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      WORKING_DIR: "./21062026" # Aapka root directory jahan code hai
+
+    steps:
+    # 1. Code ko GitHub runner par checkout karna
+    - name: Checkout Source Code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # SonarQube scan ke liye zaroori hai
+
+    # 2. tfsec ke zariye IaC (Terraform) Security Scan chalana
+    - name: Run tfsec (IaC SAST)
+      uses: aquasecurity/tfsec-action@v1.0.0
+      with:
+        working_directory: ${{ env.WORKING_DIR }}
+
+    # 3. SonarQube ke zariye Code Quality & SAST Scan chalana
+    - name: SonarQube Scan
+      uses: sonarsource/sonarqube-scan-action@master
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+    # 4. Terraform CLI install karna runner par
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.14.7 # Jo version aap use kar rahe hain
+
+    # 5. Terraform Init (Modules aur Plugins download karne ke liye)
+    - name: Terraform Init
+      run: terraform init
+      working-directory: ${{ env.WORKING_DIR }}
+
+    # 6. Code Formatting Check karna
+    - name: Terraform Format Check
+      run: terraform fmt -check
+      working-directory: ${{ env.WORKING_DIR }}
+
+    # 7. Dry Run / Plan generate karna
+    - name: Terraform Plan
+      run: terraform plan -input=false
+      working-directory: ${{ env.WORKING_DIR }}
+
+    # 8. Actual Deployment (Sirf tab chalega jab code main branch par push hoga)
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: terraform apply -auto-approve -input=false
+      working-directory: ${{ env.WORKING_DIR }}
