@@ -1,18 +1,18 @@
 variable "rgs" {
-    type = map(any)
+  type = map(any)
 }
 variable "vnets" {
-    type = map(any)
+  type = map(any)
 }
 variable "subnets" {
-    type = map(any)
+  type = map(any)
 }
 variable "nsgs" {
-    type = map(any)
+  type = map(any)
 }
 variable "nic" {
-    type = map(any)
+  type = map(any)
 }
 variable "vms" {
-    type = map(any)
+  type = map(any)
 }
