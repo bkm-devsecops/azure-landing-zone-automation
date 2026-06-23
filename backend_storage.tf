@@ -11,7 +11,7 @@ resource "azurerm_storage_account" "tf_backend_sa" {
   location                 = azurerm_resource_group.tf_backend_rg.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
-
+  min_tls_version          = "TLS1_2"
   blob_properties {
     versioning_enabled = true # Taaki state file ki history safe rahe
   }
