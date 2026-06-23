@@ -30,7 +30,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
     resource_group_name = each.value.resource_group_name
     admin_username                  = each.value.admin_username
      admin_password                  = "SecurePassword@1234" #
-  size                = "Standard_D4_v5"
+  size                = "Standard_D2a_v4"
   disable_password_authentication = false
 #   admin_username      = "adminuser"
   network_interface_ids = [azurerm_network_interface.nic[each.value.nic_key].id]
