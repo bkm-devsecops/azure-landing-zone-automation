@@ -62,7 +62,7 @@ vms = {
     name                = "dev-machine1"
     resource_group_name = "dev"
     location            = "centralindia"
-    size                = "Standard_D4_v5"
+    size                = "Standard_D2s_v5"
     admin_username      = "adminuser"
     nic_key             = "nic1"
   }
@@ -70,7 +70,7 @@ vms = {
     name                = "dev-machine2"
     resource_group_name = "dev"
     location            = "centralindia"
-    size                = "Standard_D4_v5"
+    size                = "Standard_D2s_v5"
     admin_username      = "adminuser"
     nic_key             = "nic2"
   }
