@@ -36,12 +36,14 @@ jobs:
         chmod +x tfsec-linux-amd64
         ./tfsec-linux-amd64 .
 
-    # 3. SonarQube Scan (Stable v4 Version)
-    - name: SonarQube Scan
-      uses: sonarsource/sonarqube-scan-action@v4
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  # 3. SonarQube Scanner Tool ko binary se direct root par run karna (No Secret Conflict)
+    - name: Download and Run SonarScanner Directly
+      run: |
+        wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+        unzip -q sonar-scanner-cli-5.0.1.3006-linux.zip
+        ./sonar-scanner-5.0.1.3006-linux/bin/sonar-scanner \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.token=${{ secrets.SONAR_TOKEN }}
 
     # 4. Terraform Setup
     - name: Setup Terraform
