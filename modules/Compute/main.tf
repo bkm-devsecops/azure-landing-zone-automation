@@ -1,14 +1,27 @@
-resource "azurerm_network_interface" "nic" {
-    for_each = var.nic
-    name =each.value.name
-    location =each.value.location
-    resource_group_name =each.value.resource_group_name
- ip_configuration {
-    name                          = "internal"
-    subnet_id                     = var.subnet_id[each.value.subnet_key]
-    private_ip_address_allocation = "Dynamic"
-  }
+# resource "azurerm_network_interface" "nic" {
+#     for_each = var.nic
+#     name =each.value.name
+#     location =each.value.location
+#     resource_group_name =each.value.resource_group_name
+#  ip_configuration {
+#     name                          = "internal"
+#     subnet_id                     = var.subnet_id[each.value.subnet_key]
+#     private_ip_address_allocation = "Dynamic"
+#   }
  # depends_on = [ azurerm_subnet.subnetwork ]
+resource "azurerm_network_interface" "nic" {
+  for_each            = var.nic
+  name                = each.value.name
+  location            = each.value.location
+  resource_group_name = each.value.resource_group_name
+
+  ip_configuration {
+    name                          = "internal"
+    private_ip_address_allocation = "Dynamic"
+    
+    # Bilkul sahi andaz me lookup:
+    subnet_id                     = lookup(var.subnet_id, each.value.subnet_key, null)
+  }
 }
 resource "azurerm_linux_virtual_machine" "vm" {
     for_each = var.vms
