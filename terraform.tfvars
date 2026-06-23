@@ -67,7 +67,7 @@ vms = {
     nic_key             = "nic1"
   }
   vm2 = {
-    name                = "dev-machine1"
+    name                = "dev-machine2"
     resource_group_name = "dev"
     location            = "centralindia"
     size                = "Standard_D4_v5"
