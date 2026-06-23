@@ -5,7 +5,7 @@ resource "azurerm_network_interface" "nic" {
     resource_group_name =each.value.resource_group_name
  ip_configuration {
     name                          = "internal"
-   # subnet_id                     = azurerm_subnet.subnetwork[each.key].id
+    subnet_id                     = var.subnet_id[each.value.subnet_key]
     private_ip_address_allocation = "Dynamic"
   }
  # depends_on = [ azurerm_subnet.subnetwork ]
