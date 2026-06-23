@@ -22,7 +22,7 @@ jobs:
       ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      WORKING_DIR: "./21062026" # Aapka root directory jahan code hai
+      WORKING_DIR: . # Aapka root directory jahan code hai
 
     steps:
     # 1. Code ko GitHub runner par checkout karna
@@ -35,7 +35,7 @@ jobs:
     - name: Run tfsec (IaC SAST)
       uses: aquasecurity/tfsec-action@v1.0.0
       with:
-        working_directory: ${{ env.WORKING_DIR }}
+        working_directory: .
 
     # 3. SonarQube ke zariye Code Quality & SAST Scan chalana
     - name: SonarQube Scan
@@ -53,20 +53,20 @@ jobs:
     # 5. Terraform Init (Modules aur Plugins download karne ke liye)
     - name: Terraform Init
       run: terraform init
-      working-directory: ${{ env.WORKING_DIR }}
+      working-directory: .
 
     # 6. Code Formatting Check karna
     - name: Terraform Format Check
       run: terraform fmt -check
-      working-directory: ${{ env.WORKING_DIR }}
+      working-directory: .
 
     # 7. Dry Run / Plan generate karna
     - name: Terraform Plan
       run: terraform plan -input=false
-      working-directory: ${{ env.WORKING_DIR }}
+      working-directory: .
 
     # 8. Actual Deployment (Sirf tab chalega jab code main branch par push hoga)
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: terraform apply -auto-approve -input=false
-      working-directory: ${{ env.WORKING_DIR }}
+      working-directory: .
