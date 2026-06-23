@@ -36,9 +36,9 @@ jobs:
         chmod +x tfsec-linux-amd64
         ./tfsec-linux-amd64 .
 
-    # 3. SonarQube Scan (Agar configure hai)
+    # 3. SonarQube Scan (Stable v4 Version)
     - name: SonarQube Scan
-      uses: sonarsource/sonarqube-scan-action@master
+      uses: sonarsource/sonarqube-scan-action@v4
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
@@ -49,7 +49,7 @@ jobs:
       with:
         terraform_version: 1.14.7
 
-    # 5. Terraform Workflow Commands (Sare working-directory hata kar '.' kar diye hain)
+    # 5. Terraform Workflow Commands
     - name: Terraform Init
       run: terraform init
 
