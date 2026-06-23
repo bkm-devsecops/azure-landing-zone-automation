@@ -47,12 +47,14 @@ nic = {
     name                = "dev-nic1"
     location            = "centralindia"
     resource_group_name = "dev"
+    subnet_key          = "subnet1"
 
   }
   nic2 = {
     name                = "dev-nic2"
     location            = "centralindia"
     resource_group_name = "dev"
+    subnet_key          = "subnet2"
   }
 }
 vms = {
