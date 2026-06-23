@@ -20,6 +20,6 @@ resource "azurerm_storage_account" "tf_backend_sa" {
 # 3. Blob Container jahan actually terraform.tfstate file baithegi
 resource "azurerm_storage_container" "tf_backend_container" {
   name                  = "tfstate"
-  storage_account_name  = azurerm_storage_account.tf_backend_sa.name
+  storage_account_id  = azurerm_storage_account.tf_backend_sa.id
   container_access_type = "private"
 }
