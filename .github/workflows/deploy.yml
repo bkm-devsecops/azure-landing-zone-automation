@@ -3,7 +3,7 @@ name: "Azure DevSecOps Terraform Deployment"
 on:
   push:
     branches:
-      - main  # Jab aap main branch par push karenge tab pipeline chalegi
+      - main
   pull_request:
     branches:
       - main
@@ -17,56 +17,48 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      # Azure Authentication Environment Variables
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      WORKING-DIR: . # Aapka root directory jahan code hai
 
     steps:
-    # 1. Code ko GitHub runner par checkout karna
+    # 1. GitHub runner par code download karna
     - name: Checkout Source Code
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0 # SonarQube scan ke liye zaroori hai
+        fetch-depth: 0
 
-    # 2. tfsec ke zariye IaC (Terraform) Security Scan chalana
-    - name: Run tfsec (IaC SAST)
-      uses: aquasecurity/tfsec-action@v1.0.0
-      with:
-        working_directory: .
+    # 2. tfsec ko binary se direct root par scan karna (No Path Conflicts)
+    - name: Install and Run tfsec
+      run: |
+        wget -q https://github.com/aquasecurity/tfsec/releases/download/v1.28.14/tfsec-linux-amd64
+        chmod +x tfsec-linux-amd64
+        ./tfsec-linux-amd64 .
 
-    # 3. SonarQube ke zariye Code Quality & SAST Scan chalana
+    # 3. SonarQube Scan (Agar configure hai)
     - name: SonarQube Scan
       uses: sonarsource/sonarqube-scan-action@master
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-    # 4. Terraform CLI install karna runner par
+    # 4. Terraform Setup
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
       with:
-        terraform_version: 1.14.7 # Jo version aap use kar rahe hain
+        terraform_version: 1.14.7
 
-    # 5. Terraform Init (Modules aur Plugins download karne ke liye)
+    # 5. Terraform Workflow Commands (Sare working-directory hata kar '.' kar diye hain)
     - name: Terraform Init
       run: terraform init
-      working-directory: .
 
-    # 6. Code Formatting Check karna
     - name: Terraform Format Check
       run: terraform fmt -check
-      working-directory: .
 
-    # 7. Dry Run / Plan generate karna
     - name: Terraform Plan
       run: terraform plan -input=false
-      working-directory: .
 
-    # 8. Actual Deployment (Sirf tab chalega jab code main branch par push hoga)
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: terraform apply -auto-approve -input=false
-      working-directory: .
